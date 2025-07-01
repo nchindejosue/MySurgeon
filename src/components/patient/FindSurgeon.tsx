@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { supabase, Profile, SurgeonDetails } from '../../lib/supabase';
+import { supabase, Profile, SurgeonDetails } from '../lib/supabase';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -159,16 +159,35 @@ export const FindSurgeon: React.FC = () => {
                 <h4 className="font-medium text-neutral-900">Hospital</h4>
                 <p className="text-neutral-600">{selectedSurgeon.surgeon_details.hospital_affiliation}</p>
               </div>
-              <div className="space-y-2 md:col-span-2">
-                <h4 className="font-medium text-neutral-900">Credentials</h4>
-                <p className="text-neutral-600">{selectedSurgeon.surgeon_details.credentials}</p>
+              <div className="space-y-2">
+                <h4 className="font-medium text-neutral-900">Experience</h4>
+                <p className="text-neutral-600">{selectedSurgeon.surgeon_details.years_of_experience} years</p>
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-medium text-neutral-900">Consultation Fee</h4>
+                <p className="text-neutral-600">${selectedSurgeon.surgeon_details.consultation_fee}</p>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <h4 className="font-medium text-neutral-900">About</h4>
-              <p className="text-neutral-600">{selectedSurgeon.surgeon_details.bio}</p>
-            </div>
+            {selectedSurgeon.surgeon_details.certifications && (
+              <div className="space-y-2">
+                <h4 className="font-medium text-neutral-900">Certifications</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedSurgeon.surgeon_details.certifications.map((cert, index) => (
+                    <span key={index} className="px-2 py-1 bg-primary-100 text-primary-700 rounded-full text-xs">
+                      {cert}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {selectedSurgeon.surgeon_details.bio && (
+              <div className="space-y-2">
+                <h4 className="font-medium text-neutral-900">About</h4>
+                <p className="text-neutral-600">{selectedSurgeon.surgeon_details.bio}</p>
+              </div>
+            )}
 
             <div className="flex space-x-3">
               <Button className="flex-1">Request Consultation</Button>

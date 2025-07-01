@@ -5,9 +5,10 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   hover?: boolean;
+  onClick?: () => void;
 }
 
-export const Card: React.FC<CardProps> = ({ children, className = '', hover = false }) => {
+export const Card: React.FC<CardProps> = ({ children, className = '', hover = false, onClick }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -15,6 +16,7 @@ export const Card: React.FC<CardProps> = ({ children, className = '', hover = fa
       transition={{ duration: 0.3 }}
       whileHover={hover ? { y: -2, boxShadow: '0 10px 25px -3px rgba(0, 0, 0, 0.1)' } : {}}
       className={`bg-white rounded-lg border border-neutral-200 shadow-sm ${className}`}
+      onClick={onClick}
     >
       {children}
     </motion.div>

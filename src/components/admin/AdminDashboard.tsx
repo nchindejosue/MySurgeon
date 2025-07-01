@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '../ui/Card';
 import { VolumeForecaster } from './VolumeForecaster';

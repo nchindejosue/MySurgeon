@@ -23,7 +23,7 @@ export const PatientDashboard: React.FC = () => {
           surgeon:profiles!surgical_cases_surgeon_id_fkey(full_name)
         `)
         .eq('patient_id', profile?.id)
-        .order('proposed_surgery_date', { ascending: true });
+        .order('scheduled_date', { ascending: true });
 
       if (error) throw error;
       setAppointments(data || []);
@@ -36,10 +36,10 @@ export const PatientDashboard: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Proposed': return 'bg-accent-100 text-accent-700';
-      case 'Scheduled': return 'bg-primary-100 text-primary-700';
-      case 'Completed': return 'bg-secondary-100 text-secondary-700';
-      case 'Cancelled': return 'bg-red-100 text-red-700';
+      case 'proposed': return 'bg-accent-100 text-accent-700';
+      case 'scheduled': return 'bg-primary-100 text-primary-700';
+      case 'completed': return 'bg-secondary-100 text-secondary-700';
+      case 'cancelled': return 'bg-red-100 text-red-700';
       default: return 'bg-neutral-100 text-neutral-700';
     }
   };
@@ -80,7 +80,7 @@ export const PatientDashboard: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-neutral-900">
-                  {appointments.filter(a => a.status === 'Scheduled').length}
+                  {appointments.filter(a => a.status === 'scheduled').length}
                 </p>
                 <p className="text-neutral-600">Scheduled Appointments</p>
               </div>
@@ -100,7 +100,7 @@ export const PatientDashboard: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-neutral-900">
-                  {appointments.filter(a => a.status === 'Proposed').length}
+                  {appointments.filter(a => a.status === 'proposed').length}
                 </p>
                 <p className="text-neutral-600">Pending Proposals</p>
               </div>
@@ -120,7 +120,7 @@ export const PatientDashboard: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-neutral-900">
-                  {appointments.filter(a => a.status === 'Completed').length}
+                  {appointments.filter(a => a.status === 'completed').length}
                 </p>
                 <p className="text-neutral-600">Completed Procedures</p>
               </div>
@@ -159,14 +159,14 @@ export const PatientDashboard: React.FC = () => {
                         {appointment.procedure_name}
                       </h3>
                       <p className="text-sm text-neutral-600">
-                        Dr. {(appointment as any).surgeon?.full_name}
+                        Dr. {(appointment as any).surgeon?.full_name || 'TBD'}
                       </p>
                       <p className="text-sm text-neutral-500">
-                        {new Date(appointment.proposed_surgery_date).toLocaleDateString()}
+                        {appointment.scheduled_date ? new Date(appointment.scheduled_date).toLocaleDateString() : 'Date TBD'}
                       </p>
                     </div>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${getStatusColor(appointment.status)}`}>
                     {appointment.status}
                   </span>
                 </motion.div>
