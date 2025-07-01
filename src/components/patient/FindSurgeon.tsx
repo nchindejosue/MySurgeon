@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { supabase, Profile, SurgeonDetails } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { Search, MapPin, Award, User } from 'lucide-react';
+
+interface Profile {
+  id: string;
+  email: string;
+  full_name: string;
+  role: string;
+}
+
+interface SurgeonDetails {
+  user_id: string;
+  specialty: string;
+  hospital_affiliation: string;
+  years_of_experience: number;
+  certifications: string[];
+  bio?: string;
+  consultation_fee?: number;
+}
 
 interface SurgeonWithDetails extends Profile {
   surgeon_details: SurgeonDetails;
@@ -163,13 +180,15 @@ export const FindSurgeon: React.FC = () => {
                 <h4 className="font-medium text-neutral-900">Experience</h4>
                 <p className="text-neutral-600">{selectedSurgeon.surgeon_details.years_of_experience} years</p>
               </div>
-              <div className="space-y-2">
-                <h4 className="font-medium text-neutral-900">Consultation Fee</h4>
-                <p className="text-neutral-600">${selectedSurgeon.surgeon_details.consultation_fee}</p>
-              </div>
+              {selectedSurgeon.surgeon_details.consultation_fee && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-neutral-900">Consultation Fee</h4>
+                  <p className="text-neutral-600">${selectedSurgeon.surgeon_details.consultation_fee}</p>
+                </div>
+              )}
             </div>
 
-            {selectedSurgeon.surgeon_details.certifications && (
+            {selectedSurgeon.surgeon_details.certifications && selectedSurgeon.surgeon_details.certifications.length > 0 && (
               <div className="space-y-2">
                 <h4 className="font-medium text-neutral-900">Certifications</h4>
                 <div className="flex flex-wrap gap-2">

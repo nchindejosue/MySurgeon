@@ -1,12 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase, PatientDetails, VitalSigns, SurgicalHistory } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Modal } from '../ui/Modal';
-import { User, Activity, FileText, Plus, Edit, Trash2 } from 'lucide-react';
+import { User, Activity, FileText, Plus, Edit } from 'lucide-react';
+
+interface PatientDetails {
+  user_id: string;
+  personal_info: {
+    date_of_birth?: string;
+    gender?: string;
+    address?: string;
+    phone_number?: string;
+  };
+  physical_info: {
+    height_cm?: number;
+    weight_kg?: number;
+    blood_type?: string;
+  };
+  lifestyle_info: {
+    smoking_status?: string;
+    alcohol_consumption?: string;
+  };
+}
+
+interface VitalSigns {
+  id: string;
+  patient_id: string;
+  created_at: string;
+  heart_rate: number;
+  systolic_bp: number;
+  diastolic_bp: number;
+  body_temperature_celsius: number;
+  respiratory_rate: number;
+  notes?: string;
+}
+
+interface SurgicalHistory {
+  id: string;
+  patient_id: string;
+  procedure_name: string;
+  surgery_date: string;
+  surgeon_id?: string;
+  hospital: string;
+  outcome?: string;
+  complications?: string;
+  notes?: string;
+}
 
 export const HealthProfile: React.FC = () => {
   const { profile } = useAuth();
@@ -165,23 +208,23 @@ const PersonalInfoTab: React.FC<{ patientDetails: PatientDetails | null; onEdit:
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-1">Date of Birth</label>
-          <p className="text-neutral-900">{patientDetails.personal_info.date_of_birth}</p>
+          <p className="text-neutral-900">{patientDetails.personal_info.date_of_birth || 'Not provided'}</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-1">Gender</label>
-          <p className="text-neutral-900">{patientDetails.personal_info.gender}</p>
+          <p className="text-neutral-900">{patientDetails.personal_info.gender || 'Not provided'}</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-1">Phone</label>
-          <p className="text-neutral-900">{patientDetails.personal_info.phone_number}</p>
+          <p className="text-neutral-900">{patientDetails.personal_info.phone_number || 'Not provided'}</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-1">Blood Type</label>
-          <p className="text-neutral-900">{patientDetails.physical_info.blood_type}</p>
+          <p className="text-neutral-900">{patientDetails.physical_info.blood_type || 'Not provided'}</p>
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-neutral-700 mb-1">Address</label>
-          <p className="text-neutral-900">{patientDetails.personal_info.address}</p>
+          <p className="text-neutral-900">{patientDetails.personal_info.address || 'Not provided'}</p>
         </div>
       </div>
     ) : (
@@ -278,16 +321,14 @@ const SurgicalHistoryTab: React.FC<{ surgicalHistory: SurgicalHistory[]; onAdd: 
                 <span className="text-neutral-600">Date:</span>
                 <p className="font-medium">{new Date(surgery.surgery_date).toLocaleDateString()}</p>
               </div>
-              {surgery.surgeon_name && (
+              <div>
+                <span className="text-neutral-600">Hospital:</span>
+                <p className="font-medium">{surgery.hospital}</p>
+              </div>
+              {surgery.outcome && (
                 <div>
-                  <span className="text-neutral-600">Surgeon:</span>
-                  <p className="font-medium">{surgery.surgeon_name}</p>
-                </div>
-              )}
-              {surgery.hospital_name && (
-                <div>
-                  <span className="text-neutral-600">Hospital:</span>
-                  <p className="font-medium">{surgery.hospital_name}</p>
+                  <span className="text-neutral-600">Outcome:</span>
+                  <p className="font-medium">{surgery.outcome}</p>
                 </div>
               )}
             </div>
@@ -323,7 +364,21 @@ const HealthProfileModal: React.FC<{
 
   useEffect(() => {
     if (editingItem) {
-      setFormData(editingItem);
+      if (type === 'personal') {
+        setFormData({
+          date_of_birth: editingItem.personal_info?.date_of_birth || '',
+          gender: editingItem.personal_info?.gender || '',
+          address: editingItem.personal_info?.address || '',
+          phone_number: editingItem.personal_info?.phone_number || '',
+          height_cm: editingItem.physical_info?.height_cm || '',
+          weight_kg: editingItem.physical_info?.weight_kg || '',
+          blood_type: editingItem.physical_info?.blood_type || '',
+          smoking_status: editingItem.lifestyle_info?.smoking_status || '',
+          alcohol_consumption: editingItem.lifestyle_info?.alcohol_consumption || '',
+        });
+      } else {
+        setFormData(editingItem);
+      }
     } else {
       setFormData({});
     }
@@ -353,8 +408,9 @@ const HealthProfileModal: React.FC<{
           patient_id: profile?.id,
           procedure_name: formData.procedure_name,
           surgery_date: formData.surgery_date,
-          surgeon_name: formData.surgeon_name || null,
-          hospital_name: formData.hospital_name || null,
+          hospital: formData.hospital,
+          outcome: formData.outcome || null,
+          complications: formData.complications || null,
           notes: formData.notes || null,
         };
 
@@ -373,8 +429,8 @@ const HealthProfileModal: React.FC<{
             phone_number: formData.phone_number,
           },
           physical_info: {
-            height_cm: parseFloat(formData.height_cm),
-            weight_kg: parseFloat(formData.weight_kg),
+            height_cm: parseFloat(formData.height_cm) || null,
+            weight_kg: parseFloat(formData.weight_kg) || null,
             blood_type: formData.blood_type,
           },
           lifestyle_info: {
@@ -472,18 +528,16 @@ const HealthProfileModal: React.FC<{
               value={formData.surgery_date || ''}
               onChange={(e) => setFormData({...formData, surgery_date: e.target.value})}
             />
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="Surgeon Name"
-                value={formData.surgeon_name || ''}
-                onChange={(e) => setFormData({...formData, surgeon_name: e.target.value})}
-              />
-              <Input
-                label="Hospital Name"
-                value={formData.hospital_name || ''}
-                onChange={(e) => setFormData({...formData, hospital_name: e.target.value})}
-              />
-            </div>
+            <Input
+              label="Hospital Name"
+              value={formData.hospital || ''}
+              onChange={(e) => setFormData({...formData, hospital: e.target.value})}
+            />
+            <Input
+              label="Outcome"
+              value={formData.outcome || ''}
+              onChange={(e) => setFormData({...formData, outcome: e.target.value})}
+            />
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1">Notes</label>
               <textarea

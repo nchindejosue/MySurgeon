@@ -16,25 +16,29 @@ export interface Profile {
   full_name: string;
   role: 'patient' | 'surgeon' | 'admin';
   profile_picture_url?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PatientDetails {
   user_id: string;
   personal_info: {
-    date_of_birth: string;
-    gender: string;
-    address: string;
-    phone_number: string;
+    date_of_birth?: string;
+    gender?: string;
+    address?: string;
+    phone_number?: string;
   };
   physical_info: {
-    height_cm: number;
-    weight_kg: number;
-    blood_type: string;
+    height_cm?: number;
+    weight_kg?: number;
+    blood_type?: string;
   };
   lifestyle_info: {
-    smoking_status: string;
-    alcohol_consumption: string;
+    smoking_status?: string;
+    alcohol_consumption?: string;
   };
+  created_at: string;
+  updated_at: string;
 }
 
 export interface VitalSigns {
@@ -52,26 +56,49 @@ export interface VitalSigns {
 export interface SurgicalHistory {
   id: string;
   patient_id: string;
+  surgeon_id?: string;
   procedure_name: string;
   surgery_date: string;
-  surgeon_name?: string;
-  hospital_name?: string;
+  hospital: string;
+  outcome?: string;
+  complications?: string;
   notes?: string;
+  created_at: string;
 }
 
 export interface SurgeonDetails {
   user_id: string;
   specialty: string;
   hospital_affiliation: string;
-  credentials: string;
-  bio: string;
+  years_of_experience: number;
+  certifications?: string[];
+  bio?: string;
+  consultation_fee?: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SurgicalCase {
   id: string;
   patient_id: string;
-  surgeon_id: string;
+  surgeon_id?: string;
   procedure_name: string;
-  proposed_surgery_date: string;
-  status: 'Proposed' | 'Scheduled' | 'Completed' | 'Cancelled';
+  scheduled_date?: string;
+  status: 'proposed' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  priority?: 'low' | 'medium' | 'high' | 'emergency';
+  estimated_duration_minutes?: number;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HistoricalSurgicalData {
+  id: string;
+  hospital_id: string;
+  week_number: number;
+  year: number;
+  surgical_volume: number;
+  specialty?: string;
+  season?: 'spring' | 'summer' | 'fall' | 'winter';
+  created_at: string;
 }
